@@ -1,0 +1,41 @@
+a)
+SELECT COUNT(Orders.ShipperID)
+  FROM Orders
+    JOIN Shippers on Shippers.ShipperID = Orders.ShipperID
+    GROUP BY Orders.ShipperID
+    HAVING Shippers.ShipperName = 'Speedy Express'
+
+Result: 54
+
+b)
+SELECT 
+	Employees.LastName
+  FROM Employees 
+  JOIN (
+      SELECT EmployeeID, COUNT(OrderID) as 'Number of Orders'
+        FROM Orders
+        GROUP BY EmployeeID
+        ORDER BY COUNT(OrderID) DESC
+        LIMIT 1
+  ) as MaxOrderEmp on MaxOrderEmp.EmployeeID = Employees.EmployeeID
+
+Result: Peacock
+
+c) 
+SELECT ProductName FROM Products
+  JOIN (
+    SELECT ProductID, COUNT(ProductID) as 'OrderNum'
+      FROM OrderDetails WHERE OrderID IN 
+      (
+        SELECT OrderID FROM Orders WHERE CustomerID IN 
+        (
+            SELECT CustomerID FROM Customers WHERE Country = 'Germany'
+        )
+      ) 
+      GROUP BY ProductID
+      ORDER BY OrderNum DESC
+      LIMIT 1
+  ) as ProductCount on ProductCount.ProductID = Products.ProductID
+
+Result: Gorgonzola Telino
+
